@@ -26,7 +26,6 @@ async function executeSmartLockCommand(uuid, cmd, history, signature) {
 }
 
 exports.unlock = functions.https.onRequest(async (req, res) => {
-	console.log(req.body)
 	if (req.get('x-api-key') !== process.env.API_KEY) {
 		return res.status(400).send("auth error");
 	}
