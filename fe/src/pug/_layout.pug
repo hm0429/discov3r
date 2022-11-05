@@ -1,0 +1,15 @@
+doctype html
+html
+	head
+		block head
+	body
+		#loading
+			#spinner.d-flex.justify-content-center.align-items-center
+				.spinner-border.text-primary(role='status')
+					.sr-only
+		include include/_header.pug
+		#connect-wallet-container.container-fluid.mx-auto.only-logout
+			block connect_wallet_container
+		#main-container.container-fluid.mx-auto.only-login
+			block main_container
+		
