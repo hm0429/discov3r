@@ -6,6 +6,31 @@ const CONTRACT = {
 	ABI: [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"createAccount","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"latitude","type":"string"},{"internalType":"string","name":"longitude","type":"string"},{"internalType":"bytes32","name":"keyHash","type":"bytes32"}],"name":"createTreasure","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"treasureId","type":"uint256"},{"internalType":"string","name":"key","type":"string"}],"name":"discover","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"}],"name":"setTreasureBoxContract","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"signer","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"treasureBox","outputs":[{"internalType":"contractTreasureBox","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"treasureId","type":"uint256"},{"internalType":"string","name":"uuid","type":"string"}],"name":"unlockTreasureBox","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"verified","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}]
 }
 
+const NETWORKS = {
+	'0x89': [{
+		chainId: '0x89',
+		chainName: 'Polygon',
+		rpcUrls: ['https://polygon-rpc.com/'],
+		nativeCurrency: {
+			name: "MATIC",
+			symbol: "MATIC",
+			decimals: 18
+		},
+		blockExplorerUrls: ['https://polygonscan.com/']
+	}],
+	'0x13881': [{
+		chainId: '0x13881',
+		chainName: 'Mumbai',
+		rpcUrls: ['https://rpc-mumbai.matic.today/'],
+		nativeCurrency: {
+			name: "MATIC",
+			symbol: "MATIC",
+			decimals: 18
+		},
+		blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+	}]
+} 
+
 /***********************************************************************************
 * utils
 ***********************************************************************************/
@@ -79,7 +104,8 @@ async function onWalletConnect() {
 	if (walletChainId !== window.chainId) {
 		await changeNetwork(window.chainId)
 		.catch(async (error) => {
-			alert('Invalid chain');
+			await addNetwork(NETWORKS[window.chainId])
+			await changeNetwork()
 		});
 	}
 	initContract()
@@ -108,6 +134,13 @@ async function changeNetwork(chainId) {
 		method: 'wallet_switchEthereumChain',
 		params: [{ chainId: chainId }]
 	});
+}
+
+async function addNetwork(network) {
+	await window.ethereum.request({
+			method: 'wallet_addEthereumChain',
+			params: network
+	})	
 }
 
 function onClickOpenMetaMaskApp() {
