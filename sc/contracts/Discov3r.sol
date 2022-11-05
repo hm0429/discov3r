@@ -45,7 +45,7 @@ contract Discov3r is Ownable, ITreasure {
         treasureBox = TreasureBox(payable(_address));
     }
 
-    function createDefaultTreasure(
+    function createTreasure(
         string memory name,
         string memory latitude,
         string memory longitude,
