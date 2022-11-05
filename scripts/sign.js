@@ -5,7 +5,7 @@ require('dotenv').config();
 
     const signer = new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY);
 
-    const address = "0x4B507d47B0D90f21720EA88DeB9219b25C1Fed2f";
+    const address = "0xa24CBE6d7a590E61e0271621f7A998308E469136";
 
     const message = ethers.utils.solidityKeccak256(
         ["address"], 
