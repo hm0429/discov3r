@@ -1,4 +1,12 @@
 /***********************************************************************************
+* constants
+***********************************************************************************/
+const CONTRACT = {
+	ADDRESS: "0x8204F84b07A20BF96C16703892DC816C27554f44",
+	ABI: [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"createAccount","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"latitude","type":"string"},{"internalType":"string","name":"longitude","type":"string"},{"internalType":"bytes32","name":"keyHash","type":"bytes32"}],"name":"createTreasure","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"treasureId","type":"uint256"},{"internalType":"string","name":"key","type":"string"}],"name":"discover","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"}],"name":"setTreasureBoxContract","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"signer","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"treasureBox","outputs":[{"internalType":"contractTreasureBox","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"treasureId","type":"uint256"},{"internalType":"string","name":"uuid","type":"string"}],"name":"unlockTreasureBox","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"verified","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}]
+}
+
+/***********************************************************************************
 * utils
 ***********************************************************************************/
 const getUrlParam = (key) => {
@@ -43,6 +51,17 @@ function updateView() {
 	}
 }
 
+
+/***********************************************************************************
+* Contract
+***********************************************************************************/
+async function initContract() {
+	const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+	await provider.send("eth_requestAccounts", []);
+	const signer = provider.getSigner();
+	window.contract = new ethers.Contract(CONTRACT.ADDRESS, CONTRACT.ABI, signer)
+}
+
 /***********************************************************************************
 * Wallet
 ***********************************************************************************/
@@ -63,6 +82,7 @@ async function onWalletConnect() {
 			alert('Invalid chain');
 		});
 	}
+	initContract()
 	updateView();
 }
 
@@ -125,11 +145,15 @@ async function init() {
 }
 
 async function initWithOptions() {
-	window.chainId = getChainId(getUrlParam('chain'));
+	window.chainId = getChainId(getUrlParam('c'));
+	window.treasureId = getUrlParam('t');
+	window.key = getUrlParam('k');
+	window.uuid = getUrlParam('u');
 }
 
 async function initUI() {
 	$('#button-connect-wallet').on('click', onClickButtonConnectWallet);
+	$('#button-test').on('click', onClickButtonTest);
 }
 
 async function initWeb3() {
@@ -139,6 +163,21 @@ async function initWeb3() {
 	await ethereum.request({ method: 'eth_accounts' })
 	registerWalletCallbacks();
 	onWalletAccountChanged();
+}
+
+/***********************************************************************************
+* Test
+***********************************************************************************/
+async function onClickButtonTest() {
+	console.log(window.treasureId)
+	console.log(window.key)
+	console.log(window.uuid)
+
+	const tx = await window.contract.unlockTreasureBox(
+		window.treasureId,
+		window.uuid
+	)
+	console.log(tx)
 }
 
 /***********************************************************************************
