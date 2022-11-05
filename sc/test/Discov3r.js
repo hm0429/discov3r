@@ -13,8 +13,16 @@ describe("Discov3r contract", function () {
 		// TreasureBox contract
 		const tbContractFactory = await ethers.getContractFactory("TreasureBox");
 		const tb = await tbContractFactory.deploy(contract.address);
-
 		await contract.setTreasureBoxContract(tb.address)
+    
+		// Create account
+    	const signer = new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY);		
+		const message = ethers.utils.solidityKeccak256(
+        	["address"], 
+        	[owner.address]
+    	);
+	    const signature = await signer.signMessage(ethers.utils.arrayify(message));
+	    await contract.createAccount(signature);
 
 		return { contractFactory, contract, tbContractFactory, tb, owner, addr1, addr2 };
 	}
