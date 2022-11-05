@@ -89,14 +89,13 @@ contract Discov3r is Ownable, ITreasure {
 
     function unlockTreasureBox(
         uint256 treasureId, 
-        string memory uuid,
-        string memory signature
+        string memory uuid
     ) 
         external
     {
         require(treasureBox.exists(treasureId));
         require(treasureBox.ownerOf(treasureId) == msg.sender);
-        bytes memory args = abi.encodePacked(signature, bytes1(0x00), uuid, bytes1(0x00));
+        bytes memory args = abi.encodePacked(uuid, bytes1(0x00));
         IMidpoint(startpointAddress).callMidpoint(midpointID, args);
     }
 }
