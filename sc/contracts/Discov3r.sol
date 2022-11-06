@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "./ITreasure.sol";
 import "./TreasureBox.sol";
 import "./IMidpoint.sol";
@@ -99,6 +100,34 @@ contract Discov3r is Ownable, ITreasure {
         treasureBox.mint(treasure);
     }
 
+    function createTreasureERC721(
+        string memory name,
+        string memory latitude,
+        string memory longitude,
+        address tokenAddress,
+        uint256 tokenId,
+        bytes32 keyHash
+    )
+        public
+        payable
+        onlyVerifiedAccount
+    {
+        IERC721(tokenAddress).transferFrom(msg.sender, address(this), tokenId);
+        Treasure memory treasure = Treasure(
+            msg.sender,             // address creator;
+            name,                   // string name;
+            latitude,               // string latitude;
+            longitude,              // string longitude;
+            keyHash,                // bytes32 keyHash;
+            TreasureType.Default,   // TreasureType treasureType;
+            tokenAddress,           // address tokenAddress;
+            0,                      // uint256 amount;
+            tokenId,                // uint256 tokenId;
+            false                   // bool isDiscovered;
+        );
+        treasureBox.mint(treasure);
+    }
+
     function discover(uint256 treasureId, string memory key) 
         external
     {
@@ -115,6 +144,10 @@ contract Discov3r is Ownable, ITreasure {
 
         if (treasure.treasureType == TreasureType.ERC20) {
             IERC20(treasure.tokenAddress).transfer(msg.sender, treasure.amount);
+        }
+
+        if (treasure.treasureType == TreasureType.ERC721) {
+            IERC721(treasure.tokenAddress).transferFrom(address(this), msg.sender, treasure.tokenId);
         }
 
         treasureBox.transferFrom(address(this), msg.sender, treasureId);
