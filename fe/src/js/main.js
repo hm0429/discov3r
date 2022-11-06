@@ -71,32 +71,34 @@ function hideLoading() {
 }
 
 async function updateView() {
-	const isWalletConnected = ethereum.selectedAddress ? true : false
+	const isWalletConnected = ethereum.selectedAddress ? true : false;
 	if (isWalletConnected) {
-		$('#address-label').text(ethereum.selectedAddress.substr(0, 5) + '...' + ethereum.selectedAddress.slice(-4))
-		$('.only-logout').hide()
-		$('.only-login').show()
+		$('#address-label').text(ethereum.selectedAddress.substr(0, 5) + '...' + ethereum.selectedAddress.slice(-4));
+		$('.only-logout').hide();
+		$('.only-login').show();
 		if(await isVerifiedAccount()) {
 			$('#address-label').text('✅ ' + $('#address-label').text());
-			$('#button-create-account-modal').hide()
-			$('#button-create-tb-modal').show()
+			$('#button-create-account-modal').hide();
+			$('#button-create-tb-modal').show();
 		} else {
-			$('#button-create-account-modal').show()
-			$('#button-create-tb-modal').hide()
+			$('#button-create-account-modal').show();
+			$('#button-create-tb-modal').hide();
 		}
 
 		if (window.tbId && window.key) {
-			$('#d-id').val(tbId)
-			$('#d-key').val(key)
-			const tb = window.tbs[tbId]
-			$('#d-name').val(tb.name)
-			$('#d-amount').val(tb.amount)
+			$('#d-id').val(tbId);
+			$('#d-key').val(key);
+			const tb = window.tbs[tbId];
+			$('#d-name').val(tb.name);
+			$('#d-amount').val(ethers.utils.formatEther(tb.amount));
+			$('#d-discovered').val(tb.isDiscovered);
+			$('#modal-discover').modal('show');
 		}
 
 	} else {
-		$('#address-label').text('')
-		$('.only-logout').show()
-		$('.only-login').hide()
+		$('#address-label').text('');
+		$('.only-logout').show();
+		$('.only-login').hide();
 	}
 }
 
@@ -376,9 +378,17 @@ async function onClickCreateTreasureBox() {
 	// console.log(base64Image)
 	// const storeResult = await storeNFT(base64Image, name);
 	// console.log(storeResult.url)
+}
 
-
-
+async function onClickButtonDiscover() {
+	const tbId = $('#d-id').val();
+	const key = $('#d-key').val();
+	const tx = await window.contract.discover(
+		tbId,
+		key
+	)
+	console.log(tx)
+	alert(`tx sent!: ${tx.hash}`)	
 }
 
 /***********************************************************************************
@@ -402,6 +412,7 @@ async function initUI() {
 	$('#button-test').on('click', onClickButtonTest);
 	$('#button-create-account').on('click', onClickCreateAccount);
 	$('#button-create-tb').on('click', onClickCreateTreasureBox);
+	$('#button-discover').on('click', onClickButtonDiscover);
 }
 
 async function initWeb3() {

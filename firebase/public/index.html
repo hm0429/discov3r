@@ -5,13 +5,13 @@
     <title>Discov3r</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/main.css?184856b">
+    <link rel="stylesheet" href="./css/main.css?d685f3c">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="//maps.google.com/maps/api/js?key=AIzaSyAKgGtYvI9HbqtWJ_wOkDPtsaRNemL321k&amp;language=en"></script>
     <script src="https://unpkg.com/@worldcoin/id/dist/world-id.js"></script>
-    <script src="/js/main-bundle.js?184856b"></script>
+    <script src="/js/main-bundle.js?d685f3c"></script>
   </head>
   <body>
     <div id="loading">
@@ -94,22 +94,25 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Open Treasure Box</h5>
+              <h5 class="modal-title">You discov3red Treasure Box!</h5>
               <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <div class="d-grid mx-auto mt-3">
-                <p>id:</p>
-                <input class="form-control mt-2" id="d-id" type="text" readonly>
-                <p>name:</p>
-                <input class="form-control mt-2" id="d-name" type="text" readonly>
-                <p>key:</p>
-                <input class="form-control mt-2" id="d-key" type="text" readonly>
-                <p>You will get:</p>
-                <input class="form-control mt-2" id="d-amount" type="number" readonly>
+              <div class="d-grid mx-auto">
+                <label class="mt-2">id
+                  <input class="form-control" id="d-id" type="text" readonly>
+                </label>
+                <label class="mt-2">name</label>
+                <input class="form-control" id="d-name" type="text" readonly>
+                <label class="mt-2">key</label>
+                <input class="form-control" id="d-key" type="text" readonly>
+                <label class="mt-2">You will get</label>
+                <input class="form-control" id="d-amount" type="number" readonly>
+                <label class="mt-2">Already discovered?</label>
+                <input class="form-control" id="d-discovered" type="text" readonly>
               </div>
               <div class="d-grid mx-auto mt-3">
-                <button class="btn btn-outline-primary btn-lg" id="button-discover" type="button">Open Treasure Box</button>
+                <button class="btn btn-outline-primary btn-lg" id="button-discover" type="button">Discov3r!</button>
               </div>
             </div>
             <div class="modal-footer">

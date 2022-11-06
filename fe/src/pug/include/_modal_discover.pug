@@ -2,20 +2,22 @@
   .modal-dialog
     .modal-content
       .modal-header
-        h5.modal-title Open Treasure Box
+        h5.modal-title You discov3red Treasure Box!
         button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
       .modal-body
-        .d-grid.mx-auto.mt-3
-          p id:
-          input#d-id.form-control.mt-2(type="text", readonly)
-          p name:
-          input#d-name.form-control.mt-2(type="text", readonly)
-          p key:
-          input#d-key.form-control.mt-2(type="text", readonly)
-          p You will get:
-          input#d-amount.form-control.mt-2(type="number", readonly)
+        .d-grid.mx-auto
+          label.mt-2 id
+            input#d-id.form-control(type="text", readonly)
+          label.mt-2 name
+          input#d-name.form-control(type="text", readonly)
+          label.mt-2 key
+          input#d-key.form-control(type="text", readonly)
+          label.mt-2 You will get
+          input#d-amount.form-control(type="number", readonly)
+          label.mt-2 Already discovered?
+          input#d-discovered.form-control(type="text", readonly)
         .d-grid.mx-auto.mt-3
           button#button-discover.btn.btn-outline-primary.btn-lg(type='button')
-            | Open Treasure Box
+            | Discov3r!
       .modal-footer
         button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Close
