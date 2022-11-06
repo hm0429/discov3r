@@ -410,6 +410,7 @@ async function initWeb3() {
 	}
 	await ethereum.request({ method: 'eth_accounts' })
 	registerWalletCallbacks();
+	onWalletAccountChanged();
 }
 
 async function initWorldcoin() {
