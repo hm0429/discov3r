@@ -364,9 +364,8 @@ async function onClickButtonConnectWallet() {
 async function onClickCreateAccount() {
 
 	if(!window.worldIdProof) {
-		// alert("Verify with World ID first.")
-		// return
-		window.worldIdProof = "dummy"
+		alert("Verify with World ID first.")
+		return
 	}
 
 	showLoading();

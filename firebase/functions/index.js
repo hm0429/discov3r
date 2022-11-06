@@ -120,18 +120,18 @@ exports.signature = functions.https.onRequest((req, res) => {
 	    }
 	    await updateChallenge(address);
 
-	    // const data = {
-	    // 	action_id: "wid_staging_0fa2dbde7735834e560fb5ad13146f0c",
-	    // 	signal: address,
-	    // 	merkle_root: worldIdProof.merkle_root,
-	    // 	proof: worldIdProof.proof,
-	    // 	nullifier_hash: worldIdProof.nullifier_hash
-	    // };
-	    // const verificationResult = await verifyWorldId(data);
-	    // console.log(verificationResult);
-	    // if (!verificationResult.data.success) {
-	    // 	return res.status(400).send("failed to verify");
-	    // }
+	    const data = {
+	    	action_id: "wid_staging_0fa2dbde7735834e560fb5ad13146f0c",
+	    	signal: address,
+	    	merkle_root: worldIdProof.merkle_root,
+	    	proof: worldIdProof.proof,
+	    	nullifier_hash: worldIdProof.nullifier_hash
+	    };
+	    const verificationResult = await verifyWorldId(data);
+	    console.log(verificationResult);
+	    if (!verificationResult.data.success) {
+	    	return res.status(400).send("failed to verify");
+	    }
 
 	    const serverSignature = await sign(address);
 	    return res.json({signature: serverSignature});
