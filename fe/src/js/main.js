@@ -93,6 +93,11 @@ async function updateView() {
 			$('#d-amount').val(ethers.utils.formatEther(tb.amount));
 			$('#d-discovered').val(tb.isDiscovered);
 			$('#modal-discover').modal('show');
+			if (window.uuid) {
+				$('#button-unlock').show()
+			} else {
+				$('#button-unlock').hide()
+			}
 		}
 
 	} else {
@@ -410,6 +415,14 @@ async function onClickButtonDiscover() {
 	alert(`tx sent!: ${tx.hash}`)	
 }
 
+async function onClickButtonUnlock() {
+	const tx = await window.contract.unlockTreasureBox(
+		window.tbId,
+		window.uuid
+	)
+	console.log(tx)	
+}
+
 /***********************************************************************************
 * Initialization
 ***********************************************************************************/
@@ -432,6 +445,7 @@ async function initUI() {
 	$('#button-create-account').on('click', onClickCreateAccount);
 	$('#button-create-tb').on('click', onClickCreateTreasureBox);
 	$('#button-discover').on('click', onClickButtonDiscover);
+	$('#button-unlock').on('click', onClickButtonUnlock);
 }
 
 async function initWeb3() {
