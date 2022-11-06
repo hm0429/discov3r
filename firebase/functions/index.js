@@ -47,7 +47,7 @@ exports.unlock = functions.https.onRequest(async (req, res) => {
 })
 
 async function getChallenge(address) {
-	const ref = db.collection('accounts').doc(address);
+	const ref = db.collection('accounts').doc(ethers.utils.getAddress(address));
 	const account = await ref.get();
 	if (!account.exists || !account.data().challenge) {
 		const challenge = await updateChallenge(address);
@@ -57,7 +57,7 @@ async function getChallenge(address) {
 }
 
 async function updateChallenge(address) {
-	const ref = db.collection('accounts').doc(address);
+	const ref = db.collection('accounts').doc(ethers.utils.getAddress(address));
 	const challenge = crypto.randomBytes(32).toString("hex");
 	await ref.set({
 		challenge: challenge
@@ -74,4 +74,36 @@ exports.challenge = functions.https.onRequest(async (req, res) => {
 	return res.json({challenge: challenge});
 })
 
+async function sign(address) {
+    const message = ethers.utils.solidityKeccak256(
+        ["address"], 
+        [ethers.utils.getAddress(address)]
+    );
+    const signer = new ethers.Wallet(process.env.SIGNER_PRIVATE_KEY);
+    const signature = await signer.signMessage(ethers.utils.arrayify(message));
+    return signature
+}
+
+exports.signature = functions.https.onRequest(async (req, res) => {
+	const address = req.query.address;
+	const signature = req.query.signature;
+
+	if(!address || !ethers.utils.isAddress(address) || !signature) {
+		return res.status(400).send("invalid data");
+	}
+
+	const challenge = await getChallenge(address);
+	const message = ethers.utils.solidityKeccak256(
+        ["string"], 
+        [challenge]
+    );
+    const recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(message), signature);
+    if (ethers.utils.getAddress(address) !== ethers.utils.getAddress(recoveredAddress)) {
+    	return res.status(400).send("invalid signature");
+    }
+    await updateChallenge(address);
+
+    const serverSignature = await sign(address);
+    return res.json({signature: serverSignature});
+})
 
