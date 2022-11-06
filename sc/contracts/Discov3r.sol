@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ITreasure.sol";
 import "./TreasureBox.sol";
 import "./IMidpoint.sol";
@@ -55,7 +56,7 @@ contract Discov3r is Ownable, ITreasure {
         payable
         onlyVerifiedAccount
     {
-         Treasure memory treasure = Treasure(
+        Treasure memory treasure = Treasure(
             msg.sender,             // address creator;
             name,                   // string name;
             latitude,               // string latitude;
@@ -64,6 +65,34 @@ contract Discov3r is Ownable, ITreasure {
             TreasureType.Default,   // TreasureType treasureType;
             address(0x0),           // address tokenAddress;
             msg.value,              // uint256 amount;
+            0,                      // uint256 tokenId;
+            false                   // bool isDiscovered;
+        );
+        treasureBox.mint(treasure);
+    }
+
+    function createTreasureERC20(
+        string memory name,
+        string memory latitude,
+        string memory longitude,
+        address tokenAddress,
+        uint256 amount,
+        bytes32 keyHash
+    )
+        public
+        payable
+        onlyVerifiedAccount
+    {
+        IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount);
+        Treasure memory treasure = Treasure(
+            msg.sender,             // address creator;
+            name,                   // string name;
+            latitude,               // string latitude;
+            longitude,              // string longitude;
+            keyHash,                // bytes32 keyHash;
+            TreasureType.Default,   // TreasureType treasureType;
+            tokenAddress,           // address tokenAddress;
+            amount,                 // uint256 amount;
             0,                      // uint256 tokenId;
             false                   // bool isDiscovered;
         );
@@ -82,6 +111,10 @@ contract Discov3r is Ownable, ITreasure {
         
         if (treasure.treasureType == TreasureType.Default) {
             payable(msg.sender).transfer(treasure.amount);
+        }
+
+        if (treasure.treasureType == TreasureType.ERC20) {
+            IERC20(treasure.tokenAddress).transfer(msg.sender, treasure.amount);
         }
 
         treasureBox.transferFrom(address(this), msg.sender, treasureId);
