@@ -78,6 +78,9 @@ async function updateView() {
 		$('.only-login').show()
 		if(await isVerifiedAccount()) {
 			$('#address-label').text('✅ ' + $('#address-label').text());
+			$('#button-create-account-modal').hide()
+		} else {
+			$('#button-create-account-modal').show()
 		}
 	} else {
 		$('#address-label').text('')

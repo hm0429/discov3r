@@ -13,6 +13,10 @@ body {
 	align-items: center;
 }
 
+#button-create-account-modal {
+	display: none;
+}
+
 .only-logout {
 	display: none;
 }
