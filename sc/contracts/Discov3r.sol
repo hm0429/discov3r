@@ -19,7 +19,7 @@ contract Discov3r is Ownable, ITreasure {
     TreasureBox public treasureBox;
 
     // Midpoint
-    address constant startpointAddress = 0x47a4905D4C2Eabd58abBDFEcBaeB07F1A29b660c;
+    address constant startpointAddress = 0xa89c2f3A20cED98cd39AFd0Ab5B207C46Fb2Cdf3;
     uint64 constant midpointID = 386;
 
     modifier onlyVerifiedAccount()

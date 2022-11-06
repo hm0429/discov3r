@@ -13,6 +13,10 @@ module.exports = {
     matic: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY]
+    },
+    'optimism-goerli': {
+      url: "https://goerli.optimism.io",
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY]
     }
   },
   etherscan: {
