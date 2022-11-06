@@ -5,9 +5,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/utils/Base64.sol";
 import "./ITreasure.sol";
 
 contract TreasureBox is Ownable, ERC721, ERC721Enumerable, AccessControl, ITreasure {
+    using Strings for uint256;
 
     // should be Discov3r contract
     bytes32 public constant MAIN_CONTRACT_ROLE = keccak256("MAIN_CONTRACT_ROLE");
@@ -71,6 +74,29 @@ contract TreasureBox is Ownable, ERC721, ERC721Enumerable, AccessControl, ITreas
         onlyOwner 
     {
         payable(owner()).transfer(address(this).balance);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        require(_exists(tokenId));
+        bytes memory data = abi.encodePacked(
+            '{',
+                '"name": "Discov3r TreasureBox #', tokenId.toString(), '",',
+                '"image": "', treasures[tokenId].image, '",',
+                '"external_url": "https://discov3r.xyz?t=', tokenId.toString(), '"'
+            '}'
+        );
+
+        return string(
+            abi.encodePacked(
+                "data:application/json;base64,",
+                Base64.encode(data)
+            )
+        );
     }
 
     receive() external payable {}

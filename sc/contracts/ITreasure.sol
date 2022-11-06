@@ -12,6 +12,7 @@ interface ITreasure {
     struct Treasure {
         address creator;
         string name;
+        string image;
         string latitude;
         string longitude;
         bytes32 keyHash;

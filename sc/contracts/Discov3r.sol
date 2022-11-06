@@ -49,6 +49,7 @@ contract Discov3r is Ownable, ITreasure {
 
     function createTreasure(
         string memory name,
+        string memory image,
         string memory latitude,
         string memory longitude,
         bytes32 keyHash
@@ -60,6 +61,7 @@ contract Discov3r is Ownable, ITreasure {
         Treasure memory treasure = Treasure(
             msg.sender,             // address creator;
             name,                   // string name;
+            image,                  // string image;
             latitude,               // string latitude;
             longitude,              // string longitude;
             keyHash,                // bytes32 keyHash;
@@ -74,6 +76,7 @@ contract Discov3r is Ownable, ITreasure {
 
     function createTreasureERC20(
         string memory name,
+        string memory image,
         string memory latitude,
         string memory longitude,
         address tokenAddress,
@@ -88,6 +91,7 @@ contract Discov3r is Ownable, ITreasure {
         Treasure memory treasure = Treasure(
             msg.sender,             // address creator;
             name,                   // string name;
+            image,                  // string image;
             latitude,               // string latitude;
             longitude,              // string longitude;
             keyHash,                // bytes32 keyHash;
@@ -102,6 +106,7 @@ contract Discov3r is Ownable, ITreasure {
 
     function createTreasureERC721(
         string memory name,
+        string memory image,
         string memory latitude,
         string memory longitude,
         address tokenAddress,
@@ -116,6 +121,7 @@ contract Discov3r is Ownable, ITreasure {
         Treasure memory treasure = Treasure(
             msg.sender,             // address creator;
             name,                   // string name;
+            image,                  // string image;
             latitude,               // string latitude;
             longitude,              // string longitude;
             keyHash,                // bytes32 keyHash;
