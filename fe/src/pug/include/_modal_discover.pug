@@ -1,0 +1,21 @@
+#modal-discover.modal.fade(tabindex='-1')
+  .modal-dialog
+    .modal-content
+      .modal-header
+        h5.modal-title Open Treasure Box
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+      .modal-body
+        .d-grid.mx-auto.mt-3
+          p id:
+          input#d-id.form-control.mt-2(type="text", readonly)
+          p name:
+          input#d-name.form-control.mt-2(type="text", readonly)
+          p key:
+          input#d-key.form-control.mt-2(type="text", readonly)
+          p You will get:
+          input#d-amount.form-control.mt-2(type="number", readonly)
+        .d-grid.mx-auto.mt-3
+          button#button-discover.btn.btn-outline-primary.btn-lg(type='button')
+            | Open Treasure Box
+      .modal-footer
+        button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Close

@@ -7,6 +7,9 @@ const aesCmac = require('node-aes-cmac').aesCmac;
 const crypto = require('crypto');
 const ethers = require('ethers');
 const cors = require('cors')({origin: true})
+// const { Blob } = require('buffer');
+// const { NFTStorage, File } = require('nft.storage');
+// const { base64ToBlob } = require('base64-blob');
 
 function generateRandomTag(secret) {
     let key = Buffer.from(secret, 'hex');
@@ -134,4 +137,24 @@ exports.signature = functions.https.onRequest((req, res) => {
 	    return res.json({signature: serverSignature});
 	});
 })
+
+// async function storeNFT(base64Image, name, description) {
+//     const image = await base64ToBlob(base64Image)
+//     const nftstorage = new NFTStorage({ token: process.env.NFT_STORAGE_KEY });
+//     return nftstorage.store({
+//         image,
+//         name,
+//         description,
+//     });
+// }
+
+// exports.store = functions.https.onRequest((req, res) => {
+// 	cors(req, res, async () => {
+// 		const name = req.body.name;
+// 		const description = "Discov3r Treasure Box";
+// 		const base64Image = req.body.base64Image;
+// 		const result = await storeNFT(base64Image, name, description);
+// 		return res.json(result)
+// 	})
+// })
 

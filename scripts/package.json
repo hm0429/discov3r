@@ -9,7 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "base64-blob": "^1.4.1",
     "dotenv": "^16.0.3",
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "mime": "^3.0.0",
+    "nft.storage": "^7.0.0"
   }
 }

@@ -1,0 +1,19 @@
+#modal-create-tb.modal.fade(tabindex='-1')
+  .modal-dialog
+    .modal-content
+      .modal-header
+        h5.modal-title Create Treasure Box
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+      .modal-body
+        .d-grid.mx-auto.mt-3
+          input#i-name.form-control.mt-2(type="text", placeholder="Name")
+          input#i-lat.form-control.mt-2(type="text", placeholder="Latitude")
+          input#i-lon.form-control.mt-2(type="text", placeholder="Longitude")
+          input#i-amount.form-control.mt-2(type="number", placeholder="Amount")
+          input#i-key.form-control.mt-2(type="text", placeholder="Key")
+        //-   input#i-image.form-control.mt-2(type="file")
+        .d-grid.mx-auto.mt-3
+          button#button-create-tb.btn.btn-outline-primary.btn-lg(type='button')
+            | Create Treasure Box
+      .modal-footer
+        button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Close

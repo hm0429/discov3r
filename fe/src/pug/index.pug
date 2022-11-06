@@ -12,9 +12,12 @@ block main_container
 		button#button-create-account-modal.btn.btn-outline-primary.btn-lg(type='button', data-bs-toggle="modal", data-bs-target="#modal-account-create")
 			| Verify Account
 	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto.mt-3
-		button.btn.btn-outline-primary.btn-lg(type='button')
+		button#button-create-tb-modal.btn.btn-outline-primary.btn-lg(type='button', data-bs-toggle="modal", data-bs-target="#modal-create-tb")
 			| Create TreasureBox
 	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto.mt-3
 		button#button-test.btn.btn-outline-primary.btn-lg(type='button')
 			| Test
 	include include/_modal_account_create.pug
+	include include/_modal_create_tb.pug
+	include include/_modal_discover.pug
+	
