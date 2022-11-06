@@ -88,10 +88,19 @@ async function sign(address) {
     return signature
 }
 
+async function verifyWorldId(data) {
+    return await axios({
+    	method: 'post',
+    	url: 'https://developer.worldcoin.org/api/v1/verify',
+    	data: data
+	});
+}
+
 exports.signature = functions.https.onRequest((req, res) => {
 	cors(req, res, async () => {
-		const address = req.query.address;
-		const signature = req.query.signature;
+		const address = req.body.address;
+		const signature = req.body.signature;
+		const worldIdProof = req.body.worldIdProof;
 
 		if(!address || !ethers.utils.isAddress(address) || !signature) {
 			return res.status(400).send("invalid data");
@@ -107,6 +116,19 @@ exports.signature = functions.https.onRequest((req, res) => {
 	    	return res.status(400).send("invalid signature");
 	    }
 	    await updateChallenge(address);
+
+	    // const data = {
+	    // 	action_id: "wid_staging_0fa2dbde7735834e560fb5ad13146f0c",
+	    // 	signal: address,
+	    // 	merkle_root: worldIdProof.merkle_root,
+	    // 	proof: worldIdProof.proof,
+	    // 	nullifier_hash: worldIdProof.nullifier_hash
+	    // };
+	    // const verificationResult = await verifyWorldId(data);
+	    // console.log(verificationResult);
+	    // if (!verificationResult.data.success) {
+	    // 	return res.status(400).send("failed to verify");
+	    // }
 
 	    const serverSignature = await sign(address);
 	    return res.json({signature: serverSignature});

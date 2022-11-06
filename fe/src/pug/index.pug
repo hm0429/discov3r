@@ -5,11 +5,16 @@ block connect_wallet_container
 	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto
 		button#button-connect-wallet.btn.btn-outline-dark.btn-lg(type='button')
 			| Connect Wallet
-#map-container.mt-3
-	#map
 block main_container
-	p discover
-	p unlock
-	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto
+	#map-container.mt-3
+		#map
+	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto.mt-3
+		button.btn.btn-outline-primary.btn-lg(type='button', data-bs-toggle="modal", data-bs-target="#modal-account-create")
+			| Verify Account
+	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto.mt-3
+		button.btn.btn-outline-primary.btn-lg(type='button')
+			| Create TreasureBox
+	.d-grid.gap-2.col-md-3.col-sm-6.mx-auto.mt-3
 		button#button-test.btn.btn-outline-primary.btn-lg(type='button')
 			| Test
+	include include/_modal_account_create.pug

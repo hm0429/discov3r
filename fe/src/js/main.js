@@ -1,6 +1,8 @@
 /***********************************************************************************
 * constants
 ***********************************************************************************/
+const API_ENDPOINT = "https://us-central1-discov3r.cloudfunctions.net"
+
 const CONTRACT = {
 	ADDRESS: "0x8204F84b07A20BF96C16703892DC816C27554f44",
 	ABI: [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"inputs":[{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"createAccount","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"latitude","type":"string"},{"internalType":"string","name":"longitude","type":"string"},{"internalType":"bytes32","name":"keyHash","type":"bytes32"}],"name":"createTreasure","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"treasureId","type":"uint256"},{"internalType":"string","name":"key","type":"string"}],"name":"discover","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_address","type":"address"}],"name":"setTreasureBoxContract","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"signer","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"treasureBox","outputs":[{"internalType":"contractTreasureBox","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"treasureId","type":"uint256"},{"internalType":"string","name":"uuid","type":"string"}],"name":"unlockTreasureBox","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"verified","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}]
@@ -68,12 +70,15 @@ function hideLoading() {
 	$('#loading ,#spinner').height($(window).height()).css('display', 'none')
 }
 
-function updateView() {
+async function updateView() {
 	const isWalletConnected = ethereum.selectedAddress ? true : false
 	if (isWalletConnected) {
 		$('#address-label').text(ethereum.selectedAddress.substr(0, 5) + '...' + ethereum.selectedAddress.slice(-4))
 		$('.only-logout').hide()
 		$('.only-login').show()
+		if(await isVerifiedAccount()) {
+			$('#address-label').text('✅ ' + $('#address-label').text());
+		}
 	} else {
 		$('#address-label').text('')
 		$('.only-logout').show()
@@ -112,6 +117,7 @@ function displayMap() {
 		}
 		addMarker(window.map, tb);
 	})
+	$('#map-container').show()
 }
 
 function getPosition(tb) {
@@ -130,16 +136,23 @@ function addMarker(map, tb) {
 * Contract
 ***********************************************************************************/
 async function initContract() {
-	const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-	await provider.send("eth_requestAccounts", []);
-	const signer = provider.getSigner();
+	const signer = await getSigner();
 	window.contract = new ethers.Contract(CONTRACT.ADDRESS, CONTRACT.ABI, signer)
 	window.tb = new ethers.Contract(TB_CONTRACT.ADDRESS, TB_CONTRACT.ABI, signer)
 }
 
+async function isVerifiedAccount() {
+	return await window.contract.verified(ethereum.selectedAddress)
+}
 /***********************************************************************************
 * Wallet
 ***********************************************************************************/
+async function getSigner() {
+	const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+	await provider.send("eth_requestAccounts", []);
+	return provider.getSigner();
+}
+
 async function registerWalletCallbacks() {
 	ethereum.on('connect', (connectInfo) => {
 	});
@@ -161,7 +174,9 @@ async function onWalletConnect() {
 	await initContract();
 	await loadTreasureBoxes();
 	await displayMap();
+	await initWorldcoin();
 	updateView();
+	hideLoading();
 }
 
 async function onWalletDisconnect() {
@@ -200,7 +215,50 @@ function onClickOpenMetaMaskApp() {
 	location.href = url;
 }
 
+/***********************************************************************************
+* API
+***********************************************************************************/
 
+function sendGetRequest(url) {
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			url: url,
+			type: "GET",
+			async: true,
+			contentType: "application/json",
+			dataType: "json",
+		}).then(
+			(result) => resolve(result),
+			(error) => reject(error)
+	    )
+	})
+}
+
+async function getChallenge(address) {
+	const url = `${API_ENDPOINT}/challenge?address=${address}`
+	return sendGetRequest(url)
+}
+
+async function getSignature(address, signature) {
+	const url = `${API_ENDPOINT}/signature`
+	return new Promise((resolve, reject) => {
+		$.ajax({
+			url: url,
+			data: JSON.stringify({
+				address: address,
+				signature: signature,
+				worldIdProof: window.worldIdProof
+			}),
+			type: "POST",
+			async: true,
+			contentType: "application/json",
+			dataType: "json",
+		}).then(
+			(result) => resolve(result),
+			(error) => reject(error)
+	    )
+	})
+}
 /***********************************************************************************
 * User Action
 ***********************************************************************************/
@@ -213,11 +271,41 @@ async function onClickButtonConnectWallet() {
 		}
 		alert("MetaMask should be installed.");
 	}
+	showLoading();
 	const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-	window.account = accounts[0];
-	if (window.account) {
+	if (accounts[0]) {
 		onWalletConnect();
 	}
+}
+
+async function onClickCreateAccount() {
+
+	if(!window.worldIdProof) {
+		// alert("Verify with World ID first.")
+		// return
+		window.worldIdProof = "dummy"
+	}
+
+	showLoading();
+	
+	const challenge = (await getChallenge(ethereum.selectedAddress)).challenge;
+	console.log(challenge);
+
+    const message = ethers.utils.solidityKeccak256(
+        ["string"], 
+        [challenge]
+    );
+    const signer = await getSigner();
+    const signature = await signer.signMessage(ethers.utils.arrayify(message));
+    console.log(signature);
+
+	const serverSignature = (await getSignature(ethereum.selectedAddress, signature)).signature;
+	console.log(serverSignature);
+
+	const tx = await window.contract.createAccount(serverSignature);
+	console.log(tx)
+
+	hideLoading();
 }
 
 /***********************************************************************************
@@ -239,6 +327,7 @@ async function initWithOptions() {
 async function initUI() {
 	$('#button-connect-wallet').on('click', onClickButtonConnectWallet);
 	$('#button-test').on('click', onClickButtonTest);
+	$('#button-create-account').on('click', onClickCreateAccount);
 }
 
 async function initWeb3() {
@@ -247,7 +336,20 @@ async function initWeb3() {
 	}
 	await ethereum.request({ method: 'eth_accounts' })
 	registerWalletCallbacks();
-	onWalletAccountChanged();
+}
+
+async function initWorldcoin() {
+	worldID.init('world-id-container', {
+		debug: true,
+		enable_telemetry: true,
+		action_id: 'wid_staging_0fa2dbde7735834e560fb5ad13146f0c',
+		signal: ethereum.selectedAddress,
+		on_success: (proof) => {
+			console.log(proof)
+			window.worldIdProof = proof
+		},
+		on_error: (error) => console.error(error),
+	});
 }
 
 /***********************************************************************************

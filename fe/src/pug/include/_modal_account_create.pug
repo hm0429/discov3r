@@ -1,0 +1,14 @@
+#modal-account-create.modal.fade(tabindex='-1')
+  .modal-dialog
+    .modal-content
+      .modal-header
+        h5.modal-title Verify Account with World ID
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+      .modal-body
+        .d-grid.mx-auto.mt-3.justify-content-center
+          #world-id-container
+        .d-grid.mx-auto.mt-3
+          button#button-create-account.btn.btn-outline-primary.btn-lg(type='button')
+            | Verify Account
+      .modal-footer
+        button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Close
