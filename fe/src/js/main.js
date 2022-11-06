@@ -140,12 +140,31 @@ function getPosition(tb) {
 	return {lat: parseFloat(tb.latitude), lng: parseFloat(tb.longitude)};
 }
 
+function getInfoWindow(tb) {
+
+  	return infoWindow
+}
+
 function addMarker(map, tb) {
 	const marker = new google.maps.Marker({
     	position: getPosition(tb),
     	map: map,
     	animation: google.maps.Animation.DROP
      })
+
+	marker.addListener('click', () => {
+		const content = `
+			<h3>${tb.name}</h3>
+			<p>value: ${ethers.utils.formatEther(tb.amount)}</p>
+			<p>isDiscovered: ${tb.isDiscovered}</p>
+		`
+		new google.maps.InfoWindow({
+    		content: content,
+  		}).open({
+  			anchor: marker,
+  			map
+  		})
+	})
 }
 
 /***********************************************************************************
