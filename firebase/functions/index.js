@@ -6,7 +6,7 @@ const axios = require('axios');
 const aesCmac = require('node-aes-cmac').aesCmac;
 const crypto = require('crypto');
 const ethers = require('ethers');
-
+const cors = require('cors')({origin: true})
 
 function generateRandomTag(secret) {
     let key = Buffer.from(secret, 'hex');
@@ -31,19 +31,21 @@ async function executeSmartLockCommand(uuid, cmd, history, signature) {
 	});
 }
 
-exports.unlock = functions.https.onRequest(async (req, res) => {
-	if (req.get('x-api-key') !== process.env.API_KEY) {
-		return res.status(400).send("auth error");
-	}
+exports.unlock = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		if (req.get('x-api-key') !== process.env.API_KEY) {
+			return res.status(400).send("auth error");
+		}
 
-	if(!req.body.uuid) {
-		return res.status(400).send("invalid data");
-	}
+		if(!req.body.uuid) {
+			return res.status(400).send("invalid data");
+		}
 
-	let signature = generateRandomTag(process.env.SESAME_KEY_SECRET);
-	await executeSmartLockCommand(req.body.uuid, 83, "discov3r", signature);
+		let signature = generateRandomTag(process.env.SESAME_KEY_SECRET);
+		await executeSmartLockCommand(req.body.uuid, 83, "discov3r", signature);
 
-	return res.status(200).send("ok");
+		return res.status(200).send("ok");
+	});
 })
 
 async function getChallenge(address) {
@@ -65,13 +67,15 @@ async function updateChallenge(address) {
 	return challenge;
 }
 
-exports.challenge = functions.https.onRequest(async (req, res) => {
-	const address = req.query.address;
-	if(!address || !ethers.utils.isAddress(address)) {
-		return res.status(400).send("invalid data");
-	}
-	const challenge = await getChallenge(address);
-	return res.json({challenge: challenge});
+exports.challenge = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		const address = req.query.address;
+		if(!address || !ethers.utils.isAddress(address)) {
+			return res.status(400).send("invalid data");
+		}
+		const challenge = await getChallenge(address);
+		return res.json({challenge: challenge});
+	});
 })
 
 async function sign(address) {
@@ -84,26 +88,28 @@ async function sign(address) {
     return signature
 }
 
-exports.signature = functions.https.onRequest(async (req, res) => {
-	const address = req.query.address;
-	const signature = req.query.signature;
+exports.signature = functions.https.onRequest((req, res) => {
+	cors(req, res, async () => {
+		const address = req.query.address;
+		const signature = req.query.signature;
 
-	if(!address || !ethers.utils.isAddress(address) || !signature) {
-		return res.status(400).send("invalid data");
-	}
+		if(!address || !ethers.utils.isAddress(address) || !signature) {
+			return res.status(400).send("invalid data");
+		}
 
-	const challenge = await getChallenge(address);
-	const message = ethers.utils.solidityKeccak256(
-        ["string"], 
-        [challenge]
-    );
-    const recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(message), signature);
-    if (ethers.utils.getAddress(address) !== ethers.utils.getAddress(recoveredAddress)) {
-    	return res.status(400).send("invalid signature");
-    }
-    await updateChallenge(address);
+		const challenge = await getChallenge(address);
+		const message = ethers.utils.solidityKeccak256(
+	        ["string"], 
+	        [challenge]
+	    );
+	    const recoveredAddress = ethers.utils.verifyMessage(ethers.utils.arrayify(message), signature);
+	    if (ethers.utils.getAddress(address) !== ethers.utils.getAddress(recoveredAddress)) {
+	    	return res.status(400).send("invalid signature");
+	    }
+	    await updateChallenge(address);
 
-    const serverSignature = await sign(address);
-    return res.json({signature: serverSignature});
+	    const serverSignature = await sign(address);
+	    return res.json({signature: serverSignature});
+	});
 })
 
